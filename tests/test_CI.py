@@ -31,8 +31,14 @@ def test_no_face():
 
 
 @pytest.mark.centerface
-def test_multi_face():
+def test_center_face():
     tool = facealignment.FaceAlignmentTools(weights_path="weights/")
     img = cv2.imread("tests/samples/multi_face.png")
     assert type(tool.align(img)) == np.ndarray
     assert type(tool.align(img, central_face=True)) == np.ndarray
+
+if __name__ == '__main__':
+    single_face = test_single_face()
+    multi_face = test_multi_face()
+    no_face = test_no_face()
+    center_face = test_center_face()
