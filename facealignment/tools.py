@@ -26,10 +26,12 @@
 # https://github.com/ipazc/mtcnn
 
 
+from cv2 import copyMakeBorder
 import tflite_runtime.interpreter as tflite
 import cv2
 import os
 import numpy as np
+import copy
 from skimage.transform import SimilarityTransform
 from .helper import get_file
 
@@ -177,7 +179,7 @@ class FaceAlignmentTools:
             / 112,
         }
 
-    def align(self, img, dsize: tuple = None, allow_multiface: bool = False, central_face: bool = False, alignment: list = None):
+    def align(self, img, dsize: tuple = None, allow_multiface: bool = False, central_face: bool = False, alignment: list = None, image_path: str = None):
         """Face detection and alignment of a single image
 
         :param img: color image RGB
@@ -201,7 +203,9 @@ class FaceAlignmentTools:
 
         faces = []
         for src_points in n_src_points:
-            faces.append(align_face(img, src_points, dst_points, dsize))
+            align_image = align_face(img, src_points, dst_points, dsize)
+            self.__cropped_eye_images(img, self._landmarks, image_path, 10, 10)
+            faces.append(align_image)
 
         if allow_multiface:
             return faces
@@ -209,6 +213,24 @@ class FaceAlignmentTools:
             return faces[self.__determine_center_face_idx(n_src_points, img.shape[:2])]
         else:
             return faces[0]
+
+    @staticmethod
+    def __cropped_eye_images(img, coords: np.ndarray, image_path: str, width: float=24, height: float=24):
+        assert img is not None
+
+        left_eye_image = copy.deepcopy(img)
+        right_eye_image = copy.deepcopy(img)
+
+        left_eye = [coords[0][0], coords[0][1]]
+        right_eye = [coords[1][0], coords[1][1]]
+
+        left_eye_image = left_eye_image[(left_eye[1]-height):(left_eye[1]+height), (left_eye[0]-width):(left_eye[0]+width)]
+        right_eye_image = right_eye_image[(right_eye[1]-height):(right_eye[1]+height), (right_eye[0]-width):(right_eye[0]+width)]
+ 
+        cv2.imwrite(image_path, left_eye_image)
+        cv2.imwrite(image_path, right_eye_image)
+        cv2.imwrite(img)
+
 
     @staticmethod
     def __determine_center_face_idx(n_src_points: np.ndarray, im_size: np.array):
