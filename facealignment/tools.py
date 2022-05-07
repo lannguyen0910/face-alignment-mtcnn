@@ -206,7 +206,7 @@ class FaceAlignmentTools:
         for src_points in n_src_points:
             align_image = align_face(img, src_points, dst_points, dsize)
             faces.append(align_image)
-            self.__cropped_eye_images(img, self._landmarks, image_path, str(image_count), 10, 10)
+            self.__cropped_eye_images(align_image, dst_points, image_path, str(image_count), 10, 10)
             image_count += 1
 
         if allow_multiface:
@@ -226,16 +226,26 @@ class FaceAlignmentTools:
         left_eye = [coords[0][0], coords[0][1]]
         right_eye = [coords[1][0], coords[1][1]]
 
-        left_eye_image = left_eye_image[(left_eye[1]-height):(left_eye[1]+height), (left_eye[0]-width):(left_eye[0]+width)]
-        right_eye_image = right_eye_image[(right_eye[1]-height):(right_eye[1]+height), (right_eye[0]-width):(right_eye[0]+width)]
+        left_eye_image = left_eye_image[int(left_eye[1]-height):int(left_eye[1]+height), int(left_eye[0]-width):int(left_eye[0]+width)]
+        right_eye_image = right_eye_image[int(right_eye[1]-height):int(right_eye[1]+height), int(right_eye[0]-width):int(right_eye[0]+width)]
 
-        left_eye_image_path = os.path.splitext(image_path)[0] + '_left' + image_count + os.path.splitext(image_path)[1]
-        right_eye_image_path = os.path.splitext(image_path)[0] + '_right' + image_count + os.path.splitext(image_path)[1]
-        ori_image_path = os.path.splitext(image_path)[0] + image_count + os.path.splitext(image_path)[1]
+        left_eye_image_path = os.path.splitext(image_path)[0] + '_left_' + image_count + os.path.splitext(image_path)[1]
+        right_eye_image_path = os.path.splitext(image_path)[0] + '_right_' + image_count + os.path.splitext(image_path)[1]
+        ori_image_path = os.path.splitext(image_path)[0] + '_' + image_count + os.path.splitext(image_path)[1]
+        
+        # print(img.shape)
+        # print(left_eye_image.shape)
+        # print(right_eye_image.shape)
 
-        cv2.imwrite(left_eye_image_path, left_eye_image)
-        cv2.imwrite(right_eye_image_path, right_eye_image)
-        cv2.imwrite(ori_image_path, img)
+        if isinstance(img, np.ndarray):
+            cv2.imwrite(left_eye_image_path, left_eye_image)
+            cv2.imwrite(right_eye_image_path, right_eye_image)
+            cv2.imwrite(ori_image_path, img)
+        else:
+            img.save(ori_image_path)
+            left_eye_image.save(left_eye_image_path)
+            right_eye_image.save(right_eye_image_path)
+
 
 
     @staticmethod
