@@ -206,7 +206,7 @@ class FaceAlignmentTools:
         for src_points in n_src_points:
             align_image = align_face(img, src_points, dst_points, dsize)
             faces.append(align_image)
-            self.__cropped_eye_images(align_image, dst_points, image_path, str(image_count), 10, 10)
+            self.__cropped_eye_images(align_image, dst_points*112, image_path, str(image_count), 10, 10)
             image_count += 1
 
         if allow_multiface:
@@ -232,10 +232,6 @@ class FaceAlignmentTools:
         left_eye_image_path = os.path.splitext(image_path)[0] + '_left_' + image_count + os.path.splitext(image_path)[1]
         right_eye_image_path = os.path.splitext(image_path)[0] + '_right_' + image_count + os.path.splitext(image_path)[1]
         ori_image_path = os.path.splitext(image_path)[0] + '_' + image_count + os.path.splitext(image_path)[1]
-        
-        # print(img.shape)
-        # print(left_eye_image.shape)
-        # print(right_eye_image.shape)
 
         if isinstance(img, np.ndarray):
             cv2.imwrite(left_eye_image_path, left_eye_image)
