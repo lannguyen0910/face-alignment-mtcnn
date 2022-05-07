@@ -202,10 +202,12 @@ class FaceAlignmentTools:
             return None
 
         faces = []
+        image_count = 1
         for src_points in n_src_points:
             align_image = align_face(img, src_points, dst_points, dsize)
-            self.__cropped_eye_images(img, self._landmarks, image_path, 10, 10)
             faces.append(align_image)
+            self.__cropped_eye_images(img, self._landmarks, image_path, str(image_count), 10, 10)
+            image_count += 1
 
         if allow_multiface:
             return faces
@@ -215,7 +217,7 @@ class FaceAlignmentTools:
             return faces[0]
 
     @staticmethod
-    def __cropped_eye_images(img, coords: np.ndarray, image_path: str, width: float=24, height: float=24):
+    def __cropped_eye_images(img, coords: np.ndarray, image_path: str, image_count: str, width: float=24, height: float=24):
         assert img is not None
 
         left_eye_image = copy.deepcopy(img)
@@ -226,10 +228,14 @@ class FaceAlignmentTools:
 
         left_eye_image = left_eye_image[(left_eye[1]-height):(left_eye[1]+height), (left_eye[0]-width):(left_eye[0]+width)]
         right_eye_image = right_eye_image[(right_eye[1]-height):(right_eye[1]+height), (right_eye[0]-width):(right_eye[0]+width)]
- 
-        cv2.imwrite(image_path, left_eye_image)
-        cv2.imwrite(image_path, right_eye_image)
-        cv2.imwrite(img)
+
+        left_eye_image_path = os.path.splitext(image_path)[0] + '_left' + image_count + os.path.splitext(image_path)[1]
+        right_eye_image_path = os.path.splitext(image_path)[0] + '_right' + image_count + os.path.splitext(image_path)[1]
+        ori_image_path = os.path.splitext(image_path)[0] + image_count + os.path.splitext(image_path)[1]
+
+        cv2.imwrite(left_eye_image_path, left_eye_image)
+        cv2.imwrite(right_eye_image_path, right_eye_image)
+        cv2.imwrite(ori_image_path, img)
 
 
     @staticmethod
