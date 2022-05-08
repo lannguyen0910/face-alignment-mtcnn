@@ -206,7 +206,7 @@ class FaceAlignmentTools:
         for src_points in n_src_points:
             align_image = align_face(img, src_points, dst_points, dsize)
             faces.append(align_image)
-            self.__cropped_eye_images(align_image, dst_points*112, image_path, str(image_count), 10, 10)
+            self.__cropped_eye_images(align_image, dst_points*align_image.shape[:2][::-1], image_path, str(image_count), align_image.shape[:2][::-1]//10, align_image.shape[:2][::-1]//10)
             image_count += 1
 
         if allow_multiface:
@@ -219,6 +219,8 @@ class FaceAlignmentTools:
     @staticmethod
     def __cropped_eye_images(img, coords: np.ndarray, image_path: str, image_count: str, width: float=24, height: float=24):
         assert img is not None
+
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 
         left_eye_image = copy.deepcopy(img)
         right_eye_image = copy.deepcopy(img)
