@@ -206,7 +206,7 @@ class FaceAlignmentTools:
         for src_points in n_src_points:
             align_image = align_face(img, src_points, dst_points, dsize)
             faces.append(align_image)
-            self.__cropped_eye_images(align_image, dst_points*align_image.shape[:2][::-1], image_path, str(image_count), align_image.shape[:2][::-1]//10, align_image.shape[:2][::-1]//10)
+            self.__cropped_eye_images(align_image, dst_points*align_image.shape[:2][::-1], image_path, str(image_count), align_image.shape[1]//10, align_image.shape[0]//10)
             image_count += 1
 
         if allow_multiface:
